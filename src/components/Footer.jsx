@@ -26,43 +26,90 @@ const SOCIAL = [
 ];
 
 function FooterCol({ title, links }) {
+  const renderLink = (link) => {
+    if (link.external) {
+      return (
+        <a
+          key={link.label + link.href} // use a stable key
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+        >
+          {link.label}
+        </a>
+      );
+    } else if (link.to) {
+      return (
+        <Link
+          key={link.label + link.to} // stable key
+          to={link.to}
+          className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+        >
+          {link.label}
+        </Link>
+      );
+    } else {
+      return (
+        <a
+          key={link.label + (link.href || "#")}
+          href={link.href || "#"}
+          className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+        >
+          {link.label}
+        </a>
+      );
+    }
+  };
+
   return (
     <div>
       <span className="font-mono text-[10px] tracking-[2px] uppercase text-stark-white font-bold block mb-5">
         {title}
       </span>
-      {links.map((l, i) =>
-        l.external ? (
-          <a
-            key={i}
-            href={l.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
-          >
-            {l.label}
-          </a>
-        ) : l.to ? (
-          <Link
-            key={i}
-            to={l.to}
-            className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
-          >
-            {l.label}
-          </Link>
-        ) : (
-          <a
-            key={i}
-            href={l.href || "#"}
-            className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
-          >
-            {l.label}
-          </a>
-        ),
-      )}
+      {links.map(renderLink)}
     </div>
   );
 }
+
+// function FooterCol({ title, links }) {
+//   return (
+//     <div>
+//       <span className="font-mono text-[10px] tracking-[2px] uppercase text-stark-white font-bold block mb-5">
+//         {title}
+//       </span>
+//       {links.map((l) =>
+//         l.external ? (
+//           <a
+//             key={i}
+//             href={l.href}
+//             target="_blank"
+//             rel="noopener noreferrer"
+//             className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+//           >
+//             {l.label}
+//           </a>
+//         ) : l.to ? (
+//           <Link
+//             key={i}
+//             to={l.to}
+//             className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+//           >
+//             {l.label}
+//           </Link>
+//         ) : (
+//           <a
+//             key={i}
+//             href={l.href || "#"}
+//             className="block text-[14px] font-light text-white-dim hover:text-stark-white transition-colors mb-2.5"
+//           >
+//             {l.label}
+//           </a>
+//         ),
+//       )}
+//     </div>
+//   );
+// }
 
 export function Footer() {
   return (
