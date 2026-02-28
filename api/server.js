@@ -12,11 +12,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const {
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_USER,
-  SMTP_PASS,
+  RESEND_API_KEY,
   NOTIFY_EMAIL = "hello@skilimu.com",
+  MAIL_FROM = "Skilimu <onboarding@resend.dev>",
   PORT = 4001,
 } = process.env;
 
@@ -24,10 +22,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ── Load db.json once at startup
+// ── Load db.json at startup
 const dbPath = resolve(__dirname, "../db.json");
 const db = JSON.parse(readFileSync(dbPath, "utf8"));
-const enquiries = []; // in-memory store
+const enquiries = [];
 
 // ── JSON data routes (/api/*)
 app.get("/api/programs", (_, res) => res.json(db.programs));
@@ -53,6 +51,23 @@ function getTransport() {
     });
   }
   return null;
+}
+
+// ── Resend HTTP
+async function sendViaResend({ to, from, replyTo, subject, html }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({ from, to, reply_to: replyTo, subject, html }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend ${res.status}: ${err}`);
+  }
+  return res.json();
 }
 
 // ── Email templates
@@ -160,37 +175,29 @@ app.post("/mail/send-enquiry", async (req, res) => {
   }
 
   const { subject, html: notifHtml } = buildNotificationEmail(req.body);
-  const { subject: autoSub, html: autoHtml } = buildAutoReply({ name, email });
-  const transport = getTransport();
-
-  if (!transport) {
-    console.log("\n" + "━".repeat(60));
-    console.log(" EMAIL (dev mode — SMTP not configured)");
-    console.log(`   To:      ${NOTIFY_EMAIL}`);
-    console.log(`   Subject: ${subject}`);
-    console.log(`   From:    ${name} <${email}>`);
-    console.log("━".repeat(60));
-    return res.json({ success: true, mode: "dev" });
-  }
+  const { subject: autoSubject, html: autoHtml } = buildAutoReply({
+    name,
+    email,
+  });
 
   try {
-    await transport.sendMail({
-      from: `"Skilimu Website" <${SMTP_USER}>`,
+    await sendViaResend({
+      from: MAIL_FROM,
       to: NOTIFY_EMAIL,
       replyTo: email,
       subject,
       html: notifHtml,
     });
-    await transport.sendMail({
-      from: `"Skilimu" <${SMTP_USER}>`,
+    await sendViaResend({
+      from: MAIL_FROM,
       to: email,
-      subject: autoSub,
+      subject: autoSubject,
       html: autoHtml,
     });
-    console.log(` Email sent → ${NOTIFY_EMAIL} | ${subject}`);
+    console.log("Email sent:", subject);
     res.json({ success: true, mode: "live" });
   } catch (err) {
-    console.error(" Email failed:", err.message);
+    console.error("Email failed:", err.message);
     res
       .status(500)
       .json({ error: "Email delivery failed. Enquiry was saved." });
@@ -203,11 +210,7 @@ app.get("/mail/health", (_, res) =>
 
 // ── Start
 app.listen(PORT, () => {
-  const configured = SMTP_HOST && SMTP_USER && SMTP_PASS;
   console.log(` Skilimu server → http://localhost:${PORT}`);
   console.log(`   Data API:  /api/* (programs, testimonials, faqs, stats)`);
   console.log(`   Mail:      /mail/send-enquiry`);
-  console.log(
-    `   SMTP:      ${configured ? `${SMTP_HOST} (live)` : "not configured (dev mode)"}`,
-  );
 });
