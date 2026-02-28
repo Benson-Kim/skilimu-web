@@ -4,10 +4,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npx json-server --watch db.json --port 5000\" \"vite\"",
+    "dev": "concurrently \"node api/server.js\" \"vite\"",
+    "dev:legacy": "concurrently \"node api/mailer.js\" \"npx json-server --watch db.json --port 5000\" \"vite\"",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node api/server.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "cors": "^2.8.6",

@@ -7,14 +7,14 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "http://localhost:4001",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        // rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/mail": {
-        target: "http://localhost:6000",
+        target: "http://localhost:4001",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/mail/, ""),
+        // rewrite: (path) => path.replace(/^\/mail/, ""),
       },
     },
   },

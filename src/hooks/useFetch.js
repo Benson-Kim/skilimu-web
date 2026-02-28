@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 
-const API_BASE = "/api";
-const MAIL_BASE = "/mail";
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "";
+const API_BASE = `${SERVER_URL}/api`;
+const MAIL_BASE = `${SERVER_URL}/mail`;
 
 export function useFetch(endpoint) {
   const [data, setData] = useState(null);
@@ -48,7 +49,7 @@ export async function postEnquiry(payload) {
     body: JSON.stringify({ ...payload, createdAt: ts }),
   });
 
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`DB Error: HTTP ${res.status}`);
 
   try {
     const mailRes = await fetch(`${MAIL_BASE}/send-enquiry`, {
