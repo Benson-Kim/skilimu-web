@@ -250,7 +250,7 @@ export default function ProgramDetail() {
             </div>
 
             {/* Quick stats */}
-            <div className="lg:w-80 bg-slate-mid border border-slate-light rounded-xl p-8 flex flex-col gap-6">
+            <div className="w-full lg:w-80 bg-slate-mid border border-slate-light rounded-xl p-8 flex flex-col gap-6">
               <div className="text-center pb-6 border-b border-slate-light">
                 <div className="font-mono text-[10px] tracking-[2px] uppercase text-white-dim mb-2">
                   Program

@@ -39,19 +39,6 @@ app.post("/api/enquiries", (req, res) => {
   res.status(201).json(entry);
 });
 
-// ── Nodemailer transport
-function getTransport() {
-  if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-    return nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: Number.parseInt(SMTP_PORT || "587", 10),
-      secure: SMTP_PORT === "465",
-      auth: { user: SMTP_USER, pass: SMTP_PASS },
-    });
-  }
-  return null;
-}
-
 // ── Resend HTTP
 async function sendViaResend({ to, from, replyTo, subject, html }) {
   const res = await fetch("https://api.resend.com/emails", {
@@ -204,7 +191,7 @@ app.post("/mail/send-enquiry", async (req, res) => {
 });
 
 app.get("/mail/health", (_, res) =>
-  res.json({ status: "ok", smtp: !!SMTP_HOST }),
+  res.json({ status: "ok", resend: !!RESEND_API_KEY }),
 );
 
 // ── Start
