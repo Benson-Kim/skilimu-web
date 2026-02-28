@@ -128,7 +128,7 @@ skilimu/
         ├── LogoIcon.jsx
         ├── Nav.jsx               # Fixed nav, mobile menu
         ├── Hero.jsx              # Fetches stats from /api/stats
-        ├── Programs.jsx          # Fetches programmes from /api/programs
+        ├── Programs.jsx          # Fetches programs from /api/programs
         ├── LifeUpgrade.jsx       # Static alternating rows + SVG illustrations
         ├── HowItWorks.jsx        # Static 3-step process
         ├── Testimonials.jsx      # Fetches from /api/testimonials

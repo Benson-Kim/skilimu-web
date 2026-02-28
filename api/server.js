@@ -63,7 +63,7 @@ function buildNotificationEmail({
   email,
   role,
   students,
-  programme,
+  program,
   message,
   type,
 }) {
@@ -80,7 +80,7 @@ function buildNotificationEmail({
       `<a href="mailto:${email}" style="color:#00e5a0">${email}</a>`,
     ],
     students && ["Students", students],
-    programme && ["Programme", programme],
+    program && ["Program", program],
     message && ["Message", message],
     [
       "Time (EAT)",

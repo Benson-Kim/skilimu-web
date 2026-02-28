@@ -1,7 +1,38 @@
-import { useParams, Link } from "react-router-dom";
-import { PROGRAM_DETAILS, ContactInfo } from "../data";
 import { useRef, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+
+import { PROGRAM_DETAILS, ContactInfo } from "../data";
+
 import { postEnquiry } from "../hooks/useFetch";
+import { useSEO, schemaCourse, schemaBreadcrumb } from "../hooks/useSEO";
+
+const PROGRAM_SEO = {
+  coding: {
+    title: "Coding Program for Schools in Nairobi | Ages 6–16",
+    description:
+      "Skilimu's school Coding program teaches children ages 6–16 to write real code from day one — Scratch, Python, and JavaScript. Delivered at your school in Nairobi, Kenya.",
+  },
+  "artificial-intelligence": {
+    title: "AI Program for Schools in Nairobi | Ages 10–18",
+    description:
+      "Skilimu's school AI program teaches students ages 10–18 to train models, build chatbots, and use AI with purpose. Structured, ethical, and delivered at your Nairobi school.",
+  },
+  robotics: {
+    title: "Robotics Program for Schools in Nairobi | Ages 8–18",
+    description:
+      "Skilimu's school Robotics program — LEGO Spike, Arduino, and Raspberry Pi — for ages 8–18. Students design, wire, and program real robots at your school in Nairobi.",
+  },
+  "ui-ux-design": {
+    title: "UI/UX Design Program for Schools in Nairobi | Ages 10–18",
+    description:
+      "Skilimu's UI/UX Design program teaches students ages 10–18 design thinking and Figma. Delivered at your school in Nairobi, Kenya.",
+  },
+  "cyber-safety": {
+    title: "Cyber Safety Program for Schools in Nairobi | Ages 6–16",
+    description:
+      "Skilimu's Cyber Safety program equips children ages 6–16 with digital citizenship, online privacy, and safe internet habits. Delivered at your school in Nairobi.",
+  },
+};
 
 function NotFoundProgram() {
   return (
@@ -187,7 +218,34 @@ function EnquiryForm({ programName }) {
 
 export default function ProgramDetail() {
   const { slug } = useParams();
+
   const prog = PROGRAM_DETAILS[slug];
+  const seo = PROGRAM_SEO[slug] || {};
+
+  useSEO({
+    title: seo.title || prog?.name,
+    description: seo.description || prog?.line,
+    path: `/programs/${slug}`,
+    jsonLd: prog
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            schemaCourse({
+              name: prog.name,
+              description: seo.description || prog.line,
+              slug,
+              ageRange: prog.tag,
+              duration: prog.duration,
+            }),
+            schemaBreadcrumb([
+              { name: "Home", path: "/" },
+              { name: "Programs", path: "/#programs" },
+              { name: prog.name, path: `/programs/${slug}` },
+            ]),
+          ],
+        }
+      : null,
+  });
 
   if (!prog) return <NotFoundProgram />;
 
